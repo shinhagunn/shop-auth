@@ -7,7 +7,7 @@ import (
 	"time"
 
 	GJWT "github.com/golang-jwt/jwt"
-	"github.com/shinhagunn/Shop-Watches/backend/models"
+	"github.com/shinhagunn/shop-auth/models"
 	"github.com/zsmartex/pkg/jwt"
 )
 
@@ -38,7 +38,8 @@ func CheckJWT(token string) (*jwt.Auth, error) {
 }
 
 func GenerateJWT(user *models.User) (string, error) {
-	ks, _ := jwt.LoadOrGenerateKeys("./private.key", "./public.key")
+	ks := jwt.KeyStore{}
+	ks.LoadPrivateKey("./private.key")
 	token, err := jwt.ForgeToken(user.UID, user.Email, user.Role, sql.NullString{}, 3, ks.PrivateKey, GJWT.MapClaims{})
 
 	if err != nil {

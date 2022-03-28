@@ -3,8 +3,8 @@ package main
 import (
 	"os"
 
-	"github.com/shinhagunn/Shop-Watches/backend/config"
-	"github.com/shinhagunn/Shop-Watches/backend/services"
+	"github.com/shinhagunn/shop-auth/config"
+	"github.com/shinhagunn/shop-auth/services"
 )
 
 type Service interface {
@@ -15,8 +15,6 @@ func GetService(service string) Service {
 	switch service {
 	case "email":
 		return services.NewSendEmail()
-	case "deliver":
-		return services.NewDeliver()
 	default:
 		return nil
 	}

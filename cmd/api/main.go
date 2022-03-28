@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/shinhagunn/Shop-Watches/backend/config"
-	"github.com/shinhagunn/Shop-Watches/backend/routes"
+	"github.com/shinhagunn/shop-auth/config"
+	"github.com/shinhagunn/shop-auth/routes"
 )
 
 func main() {

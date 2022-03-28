@@ -5,14 +5,13 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/shinhagunn/Shop-Watches/backend/config"
-	"github.com/shinhagunn/Shop-Watches/backend/config/collection"
-	"github.com/shinhagunn/Shop-Watches/backend/controllers"
-	"github.com/shinhagunn/Shop-Watches/backend/models"
-	"github.com/shinhagunn/Shop-Watches/backend/services"
-	"github.com/shinhagunn/Shop-Watches/backend/utils"
+	"github.com/shinhagunn/shop-auth/config"
+	"github.com/shinhagunn/shop-auth/config/collection"
+	"github.com/shinhagunn/shop-auth/controllers"
+	"github.com/shinhagunn/shop-auth/models"
+	"github.com/shinhagunn/shop-auth/services"
+	"github.com/shinhagunn/shop-auth/utils"
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type RegisterPayload struct {
@@ -28,16 +27,14 @@ func Register(c *fiber.Ctx) error {
 	}
 
 	user := &models.User{
-		UID:         utils.RandomUID(),
-		Email:       payload.Email,
-		Password:    services.HashPassword(payload.Password),
-		ChatIDs:     []primitive.ObjectID{},
-		State:       "Pending",
-		Role:        "Member",
-		UserProfile: models.UserProfile{},
+		UID:      utils.RandomUID(),
+		Email:    payload.Email,
+		Password: services.HashPassword(payload.Password),
+		State:    "Pending",
+		Role:     "Member",
 	}
 
-	if err := user.Collection().Create(user); err != nil {
+	if err := collection.User.Create(user); err != nil {
 		return c.Status(422).JSON(controllers.FailedConnectDataInDatabase)
 	}
 

@@ -10,8 +10,9 @@ import (
 	"time"
 
 	"github.com/segmentio/kafka-go"
-	"github.com/shinhagunn/Shop-Watches/backend/models"
-	"github.com/shinhagunn/Shop-Watches/backend/utils"
+	"github.com/shinhagunn/shop-auth/config/collection"
+	"github.com/shinhagunn/shop-auth/models"
+	"github.com/shinhagunn/shop-auth/utils"
 )
 
 type SendEmail struct{}
@@ -34,8 +35,8 @@ func (SendEmail) Process() {
 		if err != nil {
 			panic("could not read message " + err.Error())
 		}
-		userData := msg.Value
 
+		userData := msg.Value
 		var user models.User
 
 		err = json.Unmarshal(userData, &user)
@@ -53,7 +54,7 @@ func (SendEmail) Process() {
 			State:          "Active",
 		}
 
-		if err := code.Collection().Create(code); err != nil {
+		if err := collection.Code.Create(code); err != nil {
 			log.Println(err)
 		}
 

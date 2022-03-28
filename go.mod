@@ -1,4 +1,4 @@
-module github.com/shinhagunn/Shop-Watches/backend
+module github.com/shinhagunn/shop-auth
 
 go 1.17
 

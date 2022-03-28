@@ -2,50 +2,23 @@ package config
 
 import (
 	"context"
-	"fmt"
+	"log"
 
 	"github.com/kamva/mgm/v3"
-	"github.com/shinhagunn/Shop-Watches/backend/config/collection"
+	"github.com/shinhagunn/shop-auth/config/collection"
+	"github.com/shinhagunn/shop-auth/models"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 func InitMongoDB() {
-	mgm.SetDefaultConfig(&mgm.Config{}, "mongodb")
-	client, err := mgm.NewClient(options.Client().ApplyURI("mongodb://root:123456@localhost:27017"))
+	mgm.SetDefaultConfig(nil, "authDB", options.Client().ApplyURI("mongodb://root:123456@localhost:27017"))
 
-	if err != nil {
-		panic(err)
-	}
+	log.Println("Connected to authDB!")
 
-	InitProductDB(client)
-	InitUserDB(client)
-	InitOrderDB(client)
-}
-
-func InitProductDB(client *mongo.Client) {
-	// client, err := mgm.SetDefaultConfig()
-	// mgm.Coll()
-
-	collection.Product = mgm.NewCollection(client.Database("productDB"), "products")
-	collection.Category = mgm.NewCollection(client.Database("productDB"), "categories")
-	collection.Slide = mgm.NewCollection(client.Database("productDB"), "slides")
-
-	fmt.Println("Connected to ProductDB!")
-
-	collection.Category.Indexes().CreateOne(context.TODO(), mongo.IndexModel{
-		Keys:    bson.M{"name": 1},
-		Options: options.Index().SetUnique(true),
-	})
-}
-
-func InitUserDB(client *mongo.Client) {
-	collection.User = mgm.NewCollection(client.Database("userDB"), "users")
-	collection.Code = mgm.NewCollection(client.Database("userDB"), "codes")
-	collection.Custommer = mgm.NewCollection(client.Database("userDB"), "custommers")
-
-	fmt.Println("Connected to UserDB!")
+	collection.Code = mgm.Coll(&models.Code{})
+	collection.User = mgm.Coll(&models.User{})
 
 	collection.User.Indexes().CreateMany(context.TODO(), []mongo.IndexModel{
 		{
@@ -57,12 +30,4 @@ func InitUserDB(client *mongo.Client) {
 			Options: options.Index().SetUnique(true),
 		},
 	})
-}
-
-func InitOrderDB(client *mongo.Client) {
-	collection.Order = mgm.NewCollection(client.Database("orderDB"), "orders")
-
-	// collection.Order = mgm.Coll(&models.Order{})
-
-	fmt.Println("Connected to OrderDB!")
 }

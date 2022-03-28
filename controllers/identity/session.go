@@ -4,11 +4,11 @@ import (
 	"context"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/shinhagunn/Shop-Watches/backend/config"
-	"github.com/shinhagunn/Shop-Watches/backend/config/collection"
-	"github.com/shinhagunn/Shop-Watches/backend/controllers"
-	"github.com/shinhagunn/Shop-Watches/backend/models"
-	"github.com/shinhagunn/Shop-Watches/backend/services"
+	"github.com/shinhagunn/shop-auth/config"
+	"github.com/shinhagunn/shop-auth/config/collection"
+	"github.com/shinhagunn/shop-auth/controllers"
+	"github.com/shinhagunn/shop-auth/models"
+	"github.com/shinhagunn/shop-auth/services"
 	"go.mongodb.org/mongo-driver/bson"
 )
 
