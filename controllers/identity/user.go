@@ -2,7 +2,6 @@ package identity
 
 import (
 	"context"
-	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/shinhagunn/shop-auth/config"
@@ -43,31 +42,30 @@ func Register(c *fiber.Ctx) error {
 	session, err := config.SessionStore.Get(c)
 
 	if err != nil {
-		return c.Status(500).JSON(controllers.FailedConnectToSessions)
+		return c.Status(500).JSON(controllers.ServerInternalError)
 	}
 
 	session.Set("uid", user.UID)
 	session.Save()
 
-	return c.JSON(user)
-}
-
-type EmailPayload struct {
-	Email string `json:"email"`
+	return c.SendStatus(200)
 }
 
 func ReSendEmailCode(c *fiber.Ctx) error {
-	payload := new(EmailPayload)
+	session, err := config.SessionStore.Get(c)
 
-	if err := c.BodyParser(payload); err != nil {
-		return c.Status(422).JSON(controllers.FailedToParseBody)
+	if err != nil {
+		return c.Status(500).JSON(controllers.FailedConnectToSessions)
 	}
 
-	user := new(models.User)
-	collection.User.FindOne(context.Background(), bson.M{"email": payload.Email}).Decode(user)
+	uid := session.Get("uid")
 
-	if user.Email == "" {
-		return c.Status(422).JSON(controllers.FailedConnectDataInDatabase)
+	user := new(models.User)
+
+	collection.User.FindOne(context.Background(), bson.M{"uid": uid}).Decode(user)
+
+	if user.State != "Pending" {
+		return c.Status(422).JSON("Must be Pending")
 	}
 
 	// Check old code and change it's status
@@ -80,26 +78,13 @@ func ReSendEmailCode(c *fiber.Ctx) error {
 	}
 
 	// Create new code
-	randomCode := utils.RandomCode()
 	services.EmailProducer("new-user", user)
-
-	code := &models.Code{
-		UserID:         user.ID,
-		Code:           randomCode,
-		CodeExpiration: time.Now().Add(5 * time.Minute),
-		State:          "Active",
-	}
-
-	if err := collection.Code.Create(code); err != nil {
-		return c.Status(422).JSON(controllers.FailedConnectDataInDatabase)
-	}
 
 	return c.JSON(200)
 }
 
 type VerifyPayload struct {
-	Email string `json:"email"`
-	Code  string `json:"code"`
+	Code string `json:"code"`
 }
 
 func VerificationCode(c *fiber.Ctx) error {
@@ -109,10 +94,20 @@ func VerificationCode(c *fiber.Ctx) error {
 		return c.Status(422).JSON(controllers.FailedToParseBody)
 	}
 
+	session, err := config.SessionStore.Get(c)
+
+	if err != nil {
+		return c.Status(500).JSON(controllers.FailedConnectToSessions)
+	}
+
+	uid := session.Get("uid")
+
 	user := new(models.User)
-	collection.User.FindOne(context.Background(), bson.M{"email": payload.Email}).Decode(&user)
-	if user.Email == "" {
-		return c.Status(422).JSON(controllers.FailedConnectDataInDatabase)
+
+	collection.User.FindOne(context.Background(), bson.M{"uid": uid}).Decode(user)
+
+	if user.State != "Pending" {
+		return c.Status(422).JSON("Must be Pending")
 	}
 
 	code := new(models.Code)
@@ -135,8 +130,6 @@ func VerificationCode(c *fiber.Ctx) error {
 	if err := collection.User.Update(user); err != nil {
 		return c.Status(422).JSON(controllers.FailedConnectDataInDatabase)
 	}
-
-	session, err := config.SessionStore.Get(c)
 
 	if err != nil {
 		return c.Status(500).JSON(controllers.FailedConnectToSessions)

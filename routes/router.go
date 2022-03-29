@@ -72,14 +72,14 @@ func InitRouter() {
 		// Login
 		api_identity.Post("/login", middlewares.MustGuest, identity.Login)
 		// Logout
-		api_identity.Get("/logout", middlewares.CheckRequest, identity.Logout)
+		api_identity.Get("/logout", middlewares.MustAuth, identity.Logout)
 		// Register
 		api_identity.Post("/register", middlewares.MustGuest, identity.Register)
 
 		// Resend email code
-		api_identity.Post("/resendemail", middlewares.CheckRequest, middlewares.MustPending, identity.ReSendEmailCode)
+		api_identity.Get("/resendemail", identity.ReSendEmailCode)
 		// Verify code
-		api_identity.Post("/verifycode", middlewares.CheckRequest, middlewares.MustPending, identity.VerificationCode)
+		api_identity.Post("/verifycode", identity.VerificationCode)
 	}
 
 	api_resource := app.Group("/api/v2/resource", middlewares.CheckRequest)
