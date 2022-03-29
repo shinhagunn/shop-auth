@@ -10,6 +10,7 @@ import (
 	"github.com/shinhagunn/shop-auth/config/collection"
 	"github.com/shinhagunn/shop-auth/controllers"
 	"github.com/shinhagunn/shop-auth/controllers/identity"
+	"github.com/shinhagunn/shop-auth/controllers/public"
 	"github.com/shinhagunn/shop-auth/controllers/resource"
 	"github.com/shinhagunn/shop-auth/models"
 	"github.com/shinhagunn/shop-auth/routes/middlewares"
@@ -82,11 +83,17 @@ func InitRouter() {
 		api_identity.Post("/verifycode", identity.VerificationCode)
 	}
 
+	api_public := app.Group("/api/v2/public")
+	{
+		// Post message custommer
+		api_public.Post("/sendmessage", public.CustommerMessage)
+	}
+
 	api_resource := app.Group("/api/v2/resource", middlewares.CheckRequest)
 	{
 		// Update Password
 		api_resource.Post("/user/update/password", resource.UpdatePassword)
 	}
 
-	app.Listen(":3003")
+	app.Listen(":3001")
 }

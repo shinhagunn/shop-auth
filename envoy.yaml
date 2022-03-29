@@ -35,6 +35,11 @@ static_resources:
                 route:
                   cluster: myauth
                   prefix_rewrite: "/api/v2"
+              - match:
+                  prefix: "/api/v2/product"
+                route:
+                  cluster: product
+                  prefix_rewrite: "/api/v2"
           http_filters:
           - name: envoy.filters.http.cors
             typed_config: {}
@@ -90,7 +95,20 @@ static_resources:
             address:
               socket_address:
                 address: host.docker.internal
-                port_value: 3003
+                port_value: 3001
+  - name: product
+    connect_timeout: 0.25s
+    type: strict_dns
+    lb_policy: round_robin
+    load_assignment:
+      cluster_name: product
+      endpoints:
+      - lb_endpoints:
+        - endpoint:
+            address:
+              socket_address:
+                address: host.docker.internal
+                port_value: 3002
 admin:
   access_log_path: "/dev/null"
   address:

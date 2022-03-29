@@ -15,7 +15,7 @@ import (
 
 func MustAuth(c *fiber.Ctx) error {
 	path := strings.Replace(c.Path(), "/api/v2/auth", "", 1)
-	if strings.Contains(path, "/api/v2/myauth/identity") || strings.Contains(path, "/api/v2/myauth/public") {
+	if strings.Contains(path, "/api/v2/myauth/identity") || strings.Contains(path, "/api/v2/myauth/public") || strings.Contains(path, "api/v2/product/public") {
 		return c.SendStatus(200)
 	}
 
